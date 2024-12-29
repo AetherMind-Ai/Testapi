@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindBot-1.3 Chat</title>
+    <style>
+        /* Light Mode Default Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .chat-container {
+            margin-top: 40px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-box {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+            width: fit-content;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background-color: #e6f7ff;
+            align-self: flex-end;
+            color: #333; /* Adjusted text color */
+        }
+
+        .bot-message {
+            background-color: #f0f0f0;
+            align-self: flex-start;
+            color: #333; /* Adjusted text color */
+        }
+
+         .timestamp{
+             font-size: 0.7em;
+          color: gray;
+            margin-top: 3px;
+         }
+
+          .input-form {
+              width: 100%;
+             margin-top: 20px;
+           display: flex;
+               justify-content: center;
+       }
+
+     .input-form input[type="text"] {
+          flex-grow: 1;
+             padding: 10px;
+            margin-right: 10px;
+          border: 1px solid #ddd;
+          border-radius: 25px;  /* Rounded borders */
+         outline: none; /*Remove browser outline*/
+         transition: border-color 0.2s;/* Smooth color transition */
+      }
+
+       .input-form input[type="text"]:focus { /*Added a focused class*/
+             border-color: #007bff; /* Highlights input box */
+        }
+
+         .input-form button {
+               padding: 10px 20px;
+            background-color: #007bff;
+              color: white;
+            border: none;
+              border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .error-message {
+            color: red;
+              margin-top: 10px;
+        }
+
+        footer {
+          margin-top: auto;
+           text-align: center;
+          padding: 10px;
+              background-color: #f4f4f4;
+          transition: background-color 0.3s;
+         }
+
+
+         /* Dark Mode Styles */
+          body.dark-mode {
+           background-color: #1a1a1a;
+               color: #fff;
+        }
+
+        .chat-container.dark-mode {
+          background-color: #333;
+              box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+         }
+
+         .user-message.dark-mode {
+            background-color: #4a4a59;
+           color: #fff;
+           }
+      .bot-message.dark-mode {
+             background-color: #404040;
+              color: #fff;
+        }
+
+       footer.dark-mode {
+           background-color: #2b2b2b;
+     }
+
+       #dark-mode-toggle {
+            background-color: #007bff;
+          color: white;
+         border: none;
+              padding: 10px 20px;
+         margin: 20px auto 10px auto; /* Updated to place above chat container */
+         border-radius: 4px;
+           cursor: pointer;
+             display: block; /* To center it, as well as for margin to work */
+          }
+
+          .logo {
+           font-weight: bold;
+           cursor: pointer;
+      }
+      </style>
+</head>
+
+<body>
+    <button id="dark-mode-toggle">Toggle Dark Mode</button>
+     <!-- Moved button above the chat-container -->
+       <div class="chat-container">
+        <h1><span class="logo"><a href="/mindbot" style="color:inherit; text-decoration: none;">MindBot</a>-1.3 Chat</span>
+         </h1>
+       {% if error %}
+             <p class="error-message">{{ error }}</p>
+      {% endif %}
+          {% for user, bot in history %}
+           <div class="message-box user-message">
+                 <p><strong>User:</strong> {{ user }}</p>
+               </div>
+             <div class="message-box bot-message">
+             <p><strong>MindBot-1.3:</strong> {{ bot }}</p>
+            </div>
+           {% endfor %}
+
+         {% if response %}
+                <div class="message-box bot-message">
+                   <p><strong>MindBot-1.3:</strong> {{ response }}</p>
+                     <p class="timestamp">Submitted at: {{ submit_time }}</p>
+                     <p class="timestamp">Response Time: {{ response_time }} seconds</p>
+                  </div>
+              {% endif %}
+
+       </div>
+
+        <form class="input-form" method="post">
+           <input type="text" name="user_prompt" placeholder="Type your message here...">
+             <button type="submit">Send</button>
+        </form>
+
+     <footer>
+          <p>Copy rights <a href="/mindbot">MindBot Ai</a> 2024-2025</p>
+         </footer>
+
+    <script>
+       const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const body = document.body;
+        const chatContainer = document.querySelector('.chat-container');
+      const userMessages = document.querySelectorAll('.user-message');
+         const botMessages = document.querySelectorAll('.bot-message');
+           const footer = document.querySelector('footer');
+
+          darkModeToggle.addEventListener('click', () => {
+              body.classList.toggle('dark-mode');
+                 chatContainer.classList.toggle('dark-mode');
+                   footer.classList.toggle('dark-mode');
+                 userMessages.forEach(message => message.classList.toggle('dark-mode'));
+                botMessages.forEach(message => message.classList.toggle('dark-mode'));
+
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                  localStorage.setItem('darkMode', null);
+               }
+        });
+      if (localStorage.getItem('darkMode') === 'enabled') {
+         body.classList.add('dark-mode');
+          chatContainer.classList.add('dark-mode');
+              userMessages.forEach(message => message.classList.add('dark-mode'));
+              botMessages.forEach(message => message.classList.add('dark-mode'));
+          footer.classList.add('dark-mode');
+    }
+
+</script>
+
+</body>
+
+</html>
